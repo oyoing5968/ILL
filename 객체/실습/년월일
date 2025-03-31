@@ -1,0 +1,12 @@
+import java.util.Scanner;
+
+public class ScannerBd {
+    public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+
+    int year = scanner.nextInt();
+    System.out.println(year/10000+"년 "+(year/100)%10+"월 "+year%100+"일");
+
+    scanner.close();
+    }
+}
