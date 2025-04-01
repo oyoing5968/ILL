@@ -1,0 +1,38 @@
+import java.util.Scanner;
+
+public class SwitchCalculator {
+    public static void main(String[] args) {
+        System.out.print("연산 입력>>");
+        Scanner scanner = new Scanner(System.in);
+        double num1 = scanner.nextDouble();
+        String op = scanner.next();
+        double num2 = scanner.nextDouble();
+
+        boolean flag = true;
+
+        double result = switch (op){
+            case "더하기" -> num1 + num2;
+            case "빼기" -> num1 - num2;
+            case "곱하기" -> num1 * num2;
+            case "나누기"  -> {
+                if (num2 == 0) {
+                    System.out.println("0으로 나눌 수 없습니다.");
+                    flag = false;
+                    yield 0;
+                }
+                yield num1 / num2;
+            }
+            default -> {
+                System.out.println("사칙연산이 아닙니다.");
+                flag = false;
+                yield 0;
+            }
+
+        };
+
+        if(flag){
+            System.out.printf("%.1f %s %.1f의 계산 결과는 %.1f입니다.%n", num1, op, num2, result);
+        }
+    scanner.close();
+    }
+}
