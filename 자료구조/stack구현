@@ -1,0 +1,87 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Stack{
+	private:
+		static const int Max_Size = 100;
+		int top;
+		string data[Max_Size];
+	public:
+		Stack(){
+			top = -1;
+		}
+		
+		void push(const string word){
+			if (top < 99){
+				data[++top] = word;
+			}
+		} 
+		
+		void pop(){
+			if (top == -1){
+				cout << "empty" <<endl;	
+			}
+			else{
+				cout << data[top--] <<endl;
+			}
+		}
+		
+		void size(){
+			cout<< (top + 1) << endl;
+		}
+		
+		void empty(){
+			if (top == -1){
+				cout << "empty" << endl;
+			}
+			else {
+				cout << "not empty" << endl;
+			}
+		}
+		
+		void peek(){
+			if (top == -1){
+				cout << "empty" << endl;
+			}
+			else{
+				cout << data[top] << endl;
+			}
+		}
+};
+
+
+int main(){
+	int n;
+	cin >> n;
+	++n;
+	Stack stack1;
+	
+	for(int i = 0; i<n; ++i){
+		string input, cmd ="", arg ="";;
+		getline(cin,input);
+		bool Space = false;
+		
+		for(unsigned int i = 0; i<input.length(); ++i){
+			if (input[i] == ' ' && !Space){
+				Space = true;
+				continue;
+			}
+			
+			if(!Space){
+				cmd += input[i];
+			}
+			else{
+				arg += input[i];
+			}
+		}
+		if (cmd == "push")	stack1.push(arg);
+		else if (cmd == "pop")		stack1.pop();
+		else if (cmd == "size")		stack1.size();
+		else if (cmd == "empty")	stack1.empty();
+		else if (cmd == "top")		stack1.peek();
+	}
+	
+	return 0;
+}
