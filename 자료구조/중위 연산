@@ -1,0 +1,141 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <stdexcept>
+using namespace std;
+
+template <typename T>
+class Stack{
+	private:
+		static const int Max_Size = 100;
+		int top;
+		T data[Max_Size];
+	public:
+		Stack(){
+			top = -1;
+		}	
+		
+		void push(const T& word){
+			if(top < Max_Size -1){
+				data[++top] = word;
+			}
+		}
+		
+		void pop(T& out){
+			if(top == -1){
+				out = T();
+			}
+			else out = data[top--];
+		}
+		
+};
+
+int order(const string& op){
+	if (op == "+" || op =="-") return 1;
+	if (op == "/" || op =="*") return 2;
+	return 0;
+}
+
+vector<string> infix_to_postfix(const vector<string>& expr) {
+    vector<string> postfix;
+	Stack<string> opStack;
+	
+
+	
+	for (const string& token : expr){
+		if (token == "+" || token == "-" || token == "*" || token == "/"){
+			string top_op;
+			opStack.pop(top_op);
+			
+			while (top_op != "" && order(top_op) >= order(token)){
+				postfix.push_back(top_op);
+				opStack.pop(top_op);
+			}
+			if (top_op != ""){
+				opStack.push(top_op);
+			}
+			opStack.push(token);
+		}
+		else if (token =="("){
+			opStack.push(token);
+		}
+		else if (token ==")"){
+			string top_op;
+			opStack.pop(top_op);
+			
+			while (top_op != "(" && top_op != ""){
+				postfix.push_back(top_op);
+				opStack.pop(top_op);
+			}
+		}
+		
+		else{
+			postfix.push_back(token);
+		}
+	}
+   
+   string top_op;
+   opStack.pop(top_op);
+   while (top_op != ""){
+   	postfix.push_back(top_op);
+   	opStack.pop(top_op);
+   }
+
+    return postfix;
+}
+
+double calc_postfix(const vector<string>& expr) {
+    double result = 0.0;
+    Stack<string> st;
+
+    for (const string& arr : expr) {
+        if (arr != "+" && arr != "-" && arr != "*" && arr != "/") {
+            st.push(arr);
+        }
+        else {
+        	string second_str, first_str;
+			st.pop(second_str);
+			st.pop(first_str);
+
+            double second = stod(second_str);
+            double first = stod(first_str);
+
+            if (arr == "+") result = first + second;
+            else if (arr == "-") result = first - second;
+            else if (arr == "*") result = first * second;
+            else if (arr == "/") {
+                if (second == 0.0) {
+                    throw runtime_error("zero division error");
+                }
+                result = first / second;
+            }
+            st.push(to_string(result));
+        }
+    }
+    return result;
+}
+
+int main(){
+    vector<string> expr;
+    string line, token;
+
+    getline(cin, line);
+    stringstream ss(line);
+
+    // tokenize the given line and sequentially store each of tokens in the vector `expr`
+    while(getline(ss, token, ' '))
+        expr.push_back(token);
+
+    expr = infix_to_postfix(expr);
+
+    try {
+        cout << fixed << setprecision(2);
+        cout << calc_postfix(expr) << endl;
+    }catch(const std::runtime_error& error){
+        cout << error.what() << endl;
+    }
+
+    return 0;
+}  
