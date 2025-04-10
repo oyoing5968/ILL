@@ -4,46 +4,46 @@ using namespace std;
 
 class CircularDeque{
 	private:
-		int front;
-		int rear;
-		static const int Size = 100;
-		string data[Size];
+		int front; //앞 인덱스
+		int rear; //뒤 인덱
+		static const int Size = 100; //덱 크
+		string data[Size]; //덱 저장용 배열
 	public:
 		CircularDeque(){
 			front = 0;
 			rear = 0;
-		}
+		} //생성자. 생성할 때 초기
 	
 	    bool isEmpty() const {
         	return front == rear;
-    }
+  		 } //비어있으면 true 반환
 		
 		void addFront(const string& word){
 			front = (front - 1	+ Size) % Size;
 			data[front] = word;
-		}
+		}//front 한칸뒤로 옮기고, 거기에 word 넣기
 		
 		void addRear(const string& word){
 			data[rear] = word;
 			rear = (rear + 1) % Size;
-		}
+		}//rear 위치에 단어 넣고, 그 다음 인덱스로 이동.
 		
 		string deleteFront(){
 			if (isEmpty()) return "empty";
 			string value = data[front];
 			front = (front + 1) % Size;
 			return value;
-		}
+		}//실제로 삭제하지 않고 인덱스만 이동 시
 		
 		string deleteRear(){
 			if (isEmpty()) return "empty";
 			rear = 	(rear - 1 + Size) % Size;
 			return data[rear];
-		}
+		}//rear -1 에서 값을 꺼내고 rear을 그쪽으로 이동.
 		
 		int getSize(){
 			return (rear - front + Size) % Size;
-		}
+		}//음수 안나오게 Size더한 나누기
 		
 		string peek(const string& pos){
 			if (isEmpty()) return "empty";
@@ -55,7 +55,7 @@ class CircularDeque{
 				return data[(rear - 1 + Size) % Size];
 			}
 			
-		}
+		}//front면 맨앞, rear이면 맨뒤(rear -1확인)
 	};
 	
 int main(){
