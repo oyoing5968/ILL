@@ -1,0 +1,98 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class CircularDeque{
+	private:
+		int front;
+		int rear;
+		static const int Size = 100;
+		string data[Size];
+	public:
+		CircularDeque(){
+			front = 0;
+			rear = 0;
+		}
+	
+	    bool isEmpty() const {
+        	return front == rear;
+    }
+		
+		void addFront(const string& word){
+			front = (front - 1	+ Size) % Size;
+			data[front] = word;
+		}
+		
+		void addRear(const string& word){
+			data[rear] = word;
+			rear = (rear + 1) % Size;
+		}
+		
+		string deleteFront(){
+			if (isEmpty()) return "empty";
+			string value = data[front];
+			front = (front + 1) % Size;
+			return value;
+		}
+		
+		string deleteRear(){
+			if (isEmpty()) return "empty";
+			rear = 	(rear - 1 + Size) % Size;
+			return data[rear];
+		}
+		
+		int getSize(){
+			return (rear - front + Size) % Size;
+		}
+		
+		string peek(const string& pos){
+			if (isEmpty()) return "empty";
+			
+			if (pos == "front"){
+				return data[front];
+			}
+			else{
+				return data[(rear - 1 + Size) % Size];
+			}
+			
+		}
+	};
+	
+int main(){
+	int n;
+	cin >> n;
+	CircularDeque Deque;
+	
+	for(int i = 0; i < n; ++i){
+		string cmd;
+		cin >> cmd;
+		
+		if(cmd == "add"){
+			string pos, word;
+			cin >>pos >> word;
+			if (pos == "front"){
+				Deque.addFront(word);
+			}
+			else Deque.addRear(word);
+		}
+		else if(cmd == "delete"){
+			string pos;
+			cin >> pos;
+			cout << (pos == "front" ? Deque.deleteFront() : Deque.deleteRear()) << endl;
+		}
+		else if(cmd == "size"){
+			cout << Deque.getSize() << endl;
+		}
+		else if(cmd == "empty"){
+			cout << (Deque.isEmpty() ? "empty" : "not empty") << endl;
+		}
+		else if(cmd == "front"){
+			cout << Deque.peek("front") << endl;
+		}
+		else if(cmd == "rear"){
+			cout << Deque.peek("rear") << endl;
+		}
+	} 
+	
+	return 0;
+}
