@@ -1,0 +1,107 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+
+class CircularDeque{
+	private:
+		int front;
+		int rear;
+		static const int Size = 100;
+		string data[Size];
+	public:
+		CircularDeque(){
+			front = 0;
+			rear = 0;
+		}
+	
+	    bool isEmpty() const {
+        	return front == rear;
+    }
+		
+		void addFront(const string& word){
+			front = (front - 1	+ Size) % Size;
+			data[front] = word;
+		}
+		
+		void addRear(const string& word){
+			data[rear] = word;
+			rear = (rear + 1) % Size;
+		}
+		
+		string deleteFront(){
+			if (isEmpty()) return "empty";
+			string value = data[front];
+			front = (front + 1) % Size;
+			return value;
+		}
+		
+		string deleteRear(){
+			if (isEmpty()) return "empty";
+			rear = 	(rear - 1 + Size) % Size;
+			return data[rear];
+		}
+		
+		int getSize(){
+			return (rear - front + Size) % Size;
+		}
+		
+		string peek(const string& pos){
+			if (isEmpty()) return "empty";
+			
+			if (pos == "front"){
+				return data[front];
+			}
+			else{
+				return data[(rear - 1 + Size) % Size];
+			}
+			
+		}
+	};
+	
+int main(){
+	int n;
+	cin >> n;
+	
+	CircularDeque maleQue;
+	CircularDeque femaleQue;
+	
+	string Log[100];
+	int Count = 0;
+	int matched = 0;
+
+	
+	for(int i=0; i<n; i++){
+		int time;
+		string name, gender, pos;
+		cin >> time >> name >> gender >> pos;
+		
+		if(gender == "m"){
+			if(pos =="F"){
+				maleQue.addFront(name);
+			}
+			else maleQue.addRear(name);
+		}
+		else {
+			if(pos == "F"){
+				femaleQue.addFront(name);
+			}
+			else femaleQue.addRear(name);
+		}
+		if(!maleQue.isEmpty() && !femaleQue.isEmpty()){
+		string man = maleQue.deleteFront();
+		string woman = femaleQue.deleteFront();
+		Log[Count++] = "Matched : " + man + " " + woman;
+		matched ++;
+		}
+	}
+	for (int i = 0; i < Count; i++){
+		cout << Log[i] << endl;
+	}
+	
+	cout << matched << " " <<maleQue.getSize() << " " <<femaleQue.getSize()<< endl;
+	
+	return 0;
+	
+
+}
