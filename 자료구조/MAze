@@ -1,0 +1,99 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int MAZE_SIZE = 50;
+const int MAX_QUEUE = MAZE_SIZE * MAZE_SIZE;
+
+char maze[MAZE_SIZE][MAZE_SIZE + 1];
+bool visited[MAZE_SIZE][MAZE_SIZE];
+int Distance[MAZE_SIZE][MAZE_SIZE];
+
+int N, M;
+
+int dr[4] = {-1, 1, 0, 0}; 
+int dc[4] = {0, 0, -1, 1};
+
+int encode(int r, int c) {
+    return r * M + c;
+}
+
+class CircularDeque {
+private:
+    int front, rear;
+    int data[MAX_QUEUE];
+public:
+    CircularDeque() {
+        front = rear = 0;
+    }
+
+    bool empty() { return front == rear; }
+    bool full() { return (rear + 1) % MAX_QUEUE == front; }
+
+    void addRear(int val) {
+        rear = (rear + 1) % MAX_QUEUE;
+        data[rear] = val;
+    }
+
+    int deleteFront() {
+        front = (front + 1) % MAX_QUEUE;
+        return data[front];
+    }
+};
+
+int main() {
+    cin >> N >> M;
+    int sr= -1; 
+	int sc= -1;
+	int tr= -1;
+	int tc= -1;
+
+    for (int i = 0; i < N; i++) {
+        cin >> maze[i];
+        for (int j = 0; j < M; j++) {
+            if (maze[i][j] == 'S') {
+                sr = i;
+                sc = j;
+                maze[i][j] = '0';
+            } else if (maze[i][j] == 'T') {
+                tr = i;
+                tc = j;
+                maze[i][j] = '0';
+            }
+        }
+    }
+
+    CircularDeque queue;
+    queue.addRear(encode(sr, sc));
+    visited[sr][sc] = true;
+    Distance[sr][sc] = 1;
+
+
+    while (!queue.empty()) {
+        int val = queue.deleteFront();
+        int r = val / M;
+        int c = val % M;
+
+        for (int d = 0; d < 4; d++) {
+            int nr = r + dr[d];
+            int nc = c + dc[d];
+
+            if (nr < 0 || nc < 0 || nr >= N || nc >= M) continue;
+            if (visited[nr][nc]) continue;
+            if (maze[nr][nc] == '1') continue;
+
+            visited[nr][nc] = true;
+            Distance[nr][nc] = Distance[r][c] + 1;
+            queue.addRear(encode(nr, nc));
+
+            if (nr == tr && nc == tc) {
+                cout << Distance[nr][nc] << endl;
+                return 0;
+            }
+        }
+    }
+
+
+    cout << 0 << endl;
+    return 0;
+}
