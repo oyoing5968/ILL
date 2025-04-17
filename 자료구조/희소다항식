@@ -1,0 +1,108 @@
+#include <iostream>
+
+using namespace std;
+
+class Polynomial{
+private:
+    double coeff; // 계수
+    int degree;   // 차수
+public:
+    Polynomial(double coeff = 0.0, int degree = 0){
+        this->coeff = coeff;
+        this->degree = degree;
+    }
+    // 필요하면 아래에 관련 멤버 함수 작성 가능
+    
+    double get_coeff() {
+    	return coeff;
+	}
+    int get_degree() {
+    	return degree;
+	};
+};
+
+class Node{
+	public:
+		Polynomial data;
+		Node* next;
+		
+		Node(Polynomial P){
+			data = P;
+			next = nullptr;
+		}
+};
+
+class PolynomialList{
+	private:
+		Node* head;
+	public:
+		PolynomialList(){
+			head = nullptr;
+		}
+		
+		void insert(double coeff, int degree){
+			Polynomial P(coeff, degree);
+			Node* newNode = new Node(P);
+			
+			if(head == nullptr || degree > head->data.get_degree()){
+				newNode->next = head;
+				head = newNode;
+				return;
+			}
+			
+			else{
+				Node* current = head;
+				while(current->next != nullptr && current->next->data.get_degree() > degree){
+					current = current->next;
+				}
+			newNode->next = current->next;
+			current->next = newNode;
+			}
+		}
+		
+		void display(){
+			cout << "f(x) = ";
+			Node* current = head;
+			
+			while(current != nullptr){
+				printf("%.1f x^%d", current->data.get_coeff(), current->data.get_degree());
+				
+				if(current->next != nullptr){
+					cout << " + ";
+				}
+				
+				current = current->next;
+			}
+			
+			cout << endl;
+		}
+		
+		~PolynomialList(){
+			Node* current = head;
+			
+			while (current != nullptr){
+				Node* box = current;
+				current = current->next;
+				delete box;
+			}
+		}
+};
+
+int main(){
+	int n;
+	cin >> n;
+	
+	PolynomialList list;
+	
+	for (int i = 0; i<n; i++){
+		double coeff;
+		int degree;
+		
+		cin>> coeff >> degree;
+		list.insert(coeff, degree);
+	}
+	
+	list.display();
+	
+	return 0;
+}
