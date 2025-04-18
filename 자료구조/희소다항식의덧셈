@@ -1,0 +1,174 @@
+#include <iostream>
+
+using namespace std;
+
+class Polynomial{
+private:
+    double coeff; // 계수
+    int degree;   // 차수
+public:
+    Polynomial(double coeff = 0.0, int degree = 0){
+        this->coeff = coeff;
+        this->degree = degree;
+    }
+    // 필요하면 아래에 관련 멤버 함수 작성 가능
+    
+    double get_coeff() {
+    	return coeff;
+	}
+    int get_degree() {
+    	return degree;
+	};
+};
+
+class Node{
+	public:
+		Polynomial data;
+		Node* next;
+		
+		Node(Polynomial P){
+			data = P;
+			next = nullptr;
+		}
+};
+
+class PolynomialList{
+	private:
+		Node* head;
+	public:
+		PolynomialList(){
+			head = nullptr;
+		}
+		
+		void insert(double coeff, int degree){
+			Polynomial P(coeff, degree);
+			Node* newNode = new Node(P);
+			
+			if(head == nullptr || degree > head->data.get_degree()){
+				newNode->next = head;
+				head = newNode;
+				return;
+			}
+			
+			else{
+				Node* current = head;
+				while(current->next != nullptr && current->next->data.get_degree() > degree){
+					current = current->next;
+				}
+			newNode->next = current->next;
+			current->next = newNode;
+			}
+		}
+		
+		void display(){
+			Node* current = head;
+			
+			if(current == nullptr){
+				cout << "f(x) = 0";
+				return;
+			}
+			
+			cout << "f(x) = ";
+			while(current != nullptr){
+				printf("%.1f x^%d", current->data.get_coeff(), current->data.get_degree());
+				
+				if(current->next != nullptr){
+					cout << " + ";
+				}
+				
+				current = current->next;
+			}
+			
+			cout << endl;
+		}
+		
+		PolynomialList add(const PolynomialList& other){
+			PolynomialList end;
+			
+			Node* P1 = this->head;
+			Node* P2 = other.head;
+			
+			while (P1 != nullptr && P2 != nullptr){
+				int deg1 = P1->data.get_degree();
+				int deg2 = P2->data.get_degree();
+				
+				if (deg1 == deg2){
+					double sum = P1->data.get_coeff() + P2->data.get_coeff();
+					if(sum != 0.0){
+						end.insert(sum, deg1);
+					}
+					
+					P1 = P1->next;
+					P2 = P2->next;
+				}
+				else if(deg1>deg2){
+					end.insert(P1->data.get_coeff(), deg1);
+					P1 = P1->next;
+				}
+				else{
+					end.insert(P2->data.get_coeff(), deg2);
+					P2 = P2->next;
+				}
+			}
+			
+			while (P1 != nullptr){
+				end.insert(P1->data.get_coeff(), P1->data.get_degree());
+				P1 = P1->next;
+			}
+			
+			while (P2 != nullptr){
+				end.insert(P2->data.get_coeff(), P2->data.get_degree());
+				P2 = P2->next;
+			}		
+			return end;
+		}
+		
+		
+		~PolynomialList(){
+			Node* current = head;
+			
+			while (current != nullptr){
+				Node* box = current;
+				current = current->next;
+				delete box;
+			}
+		}
+};
+
+int main(){
+	int n;
+	cin >> n;
+	
+	PolynomialList list1;
+
+	
+	for (int i = 0; i<n; i++){
+		double coeff;
+		int degree;
+		
+		cin>> coeff >> degree;
+		list1.insert(coeff, degree);
+	}
+	
+	int m;
+	cin >> m;
+	
+	PolynomialList list2;
+
+	
+	for (int i = 0; i<m; i++){
+		double coeff;
+		int degree;
+		
+		cin>> coeff >> degree;
+		list2.insert(coeff, degree);
+	}
+	
+	list1.display();
+	list2.display();
+	
+	PolynomialList Sum = list1.add(list2);
+	Sum.display();
+	
+	return 0;
+}
