@@ -1,0 +1,32 @@
+import java.util.Scanner;
+
+public class AverageOver0 {
+    public static void main(String[] args) {
+        System.out.print("양의 정수를 입력하세요. -1은 입력 끝>>");
+        Scanner sc = new Scanner(System.in);
+        int sum = 0;
+        int count = 0;
+
+        while(true){
+            String input = sc.next();
+
+            try{
+                int num = Integer.parseInt(input);
+                if (num == -1) break;
+
+                if(num>0){
+                    sum += num;
+                    count++;
+                }
+                else if(num<=0){
+                    System.out.println(num +" 제외");
+                }
+            }
+            catch(NumberFormatException e){
+                System.out.println(input +" 제외");
+            }
+        }
+        System.out.println("평균은 " + sum/count);
+        sc.close();
+    }
+}
