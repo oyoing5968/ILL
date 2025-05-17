@@ -1,0 +1,176 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class BinaryNode {
+    friend class BinarySearchTree;
+
+private:
+    string key;
+    int value;
+    BinaryNode* left;
+    BinaryNode* right;
+
+public:
+    BinaryNode(string key = "", int value = 0, BinaryNode* left = nullptr, BinaryNode* right = nullptr) {
+        this->key = key;
+        this->value = value;
+        this->left = left;
+        this->right = right;
+    }
+
+    bool isLeaf() {
+        return left == nullptr && right == nullptr;
+    }
+
+    bool hasTwoChildren() {
+        return left != nullptr && right != nullptr;
+    }
+
+    bool hasOneChild() {
+        return (left != nullptr && right == nullptr) || (left == nullptr && right != nullptr);
+    }
+};
+
+class BinarySearchTree {
+private:
+    BinaryNode* root;
+    int nodeCount;
+
+    BinaryNode* search(BinaryNode* node, const string& key) {
+        if (node == nullptr || node->key == key) return node;
+        if (key < node->key) return search(node->left, key);
+        else return search(node->right, key);
+    }
+
+    void insert(BinaryNode*& node, const string& key, int value) {
+        if (node == nullptr) {
+            node = new BinaryNode(key, value);
+            nodeCount++;
+        } else if (key == node->key) {
+            node->value = value;
+        } else if (key < node->key) {
+            insert(node->left, key, value);
+        } else {
+            insert(node->right, key, value);
+        }
+    }
+
+    BinaryNode* leftmost(BinaryNode* node) {
+        while (node->left != nullptr)
+            node = node->left;
+        return node;
+    }
+
+    BinaryNode* remove(BinaryNode* node, BinaryNode* parent, const string& key, bool& found) {
+        if (node == nullptr) return nullptr;
+
+        if (key < node->key) {
+            node->left = remove(node->left, node, key, found);
+        } else if (key > node->key) {
+            node->right = remove(node->right, node, key, found);
+        } else {
+            found = true;
+            nodeCount--;
+            if (node->isLeaf()) {
+                if (node == root) root = nullptr;
+                else if (parent->left == node) parent->left = nullptr;
+                else parent->right = nullptr;
+                return node;
+            } else if (node->hasOneChild()) {
+                BinaryNode* child = node->left ? node->left : node->right;
+                if (node == root) root = child;
+                else if (parent->left == node) parent->left = child;
+                else parent->right = child;
+                return node;
+            } else {
+                BinaryNode* succ = leftmost(node->right);
+                node->key = succ->key;
+                node->value = succ->value;
+                node->right = remove(node->right, node, succ->key, found);
+            }
+        }
+        return node;
+    }
+
+    void clear(BinaryNode* node) {
+        if (!node) return;
+        clear(node->left);
+        clear(node->right);
+        delete node;
+    }
+
+public:
+    BinarySearchTree() {
+        root = nullptr;
+        nodeCount = 0;
+    }
+
+    ~BinarySearchTree() {
+        clear(root);
+    }
+
+    bool empty() const {
+        return nodeCount == 0;
+    }
+
+    int size() const {
+        return nodeCount;
+    }
+
+    int search(const string& key) {
+        BinaryNode* node = search(root, key);
+        if (node == nullptr) throw "out-of-key";
+        return node->value;
+    }
+
+    void insert(const string& key, int value) {
+        insert(root, key, value);
+    }
+
+    bool remove(const string& key) {
+        bool found = false;
+        root = remove(root, nullptr, key, found);
+        return found;
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+
+    BinarySearchTree bst;
+
+    for (int i = 0; i < n; ++i) {
+        string cmd;
+        cin >> cmd;
+
+        if (cmd == "insert") {
+            string key;
+            int value;
+            cin >> key >> value;
+            bst.insert(key, value);
+        } else if (cmd == "remove") {
+            string key;
+            cin >> key;
+            if (!bst.remove(key)) {
+                cout << "out-of-key" << endl;
+            }
+        } else if (cmd == "search") {
+            string key;
+            cin >> key;
+            try {
+                int value = bst.search(key);
+                cout << value << endl;
+            } catch (...) {
+                cout << "out-of-key" << endl;
+            }
+        } else if (cmd == "empty") {
+            cout << (bst.empty() ? "empty" : "not empty") << endl;
+        } else if (cmd == "size") {
+            cout << bst.size() << endl;
+        }
+    }
+
+    return 0;
+}
