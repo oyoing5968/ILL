@@ -1,0 +1,121 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class BinaryNode {
+private:
+    int data;
+    BinaryNode* left;
+    BinaryNode* right;
+
+public:
+    BinaryNode(int data = 0, BinaryNode* left = nullptr, BinaryNode* right = nullptr) {
+        this->data = data;
+        this->left = left;
+        this->right = right;
+    }
+
+    int getData() { return data; }
+    BinaryNode* getLeft() { return left; }
+    BinaryNode* getRight() { return right; }
+    void setData(int data) { this->data = data; }
+    void setLeft(BinaryNode* node) { left = node; }
+    void setRight(BinaryNode* node) { right = node; }
+};
+
+class BinarySearchTree {
+private:
+    BinaryNode* root;
+
+    BinaryNode* insert(BinaryNode* node, int key) {
+        if (!node) return new BinaryNode(key);
+        if (key < node->getData())
+            node->setLeft(insert(node->getLeft(), key));
+        else if (key > node->getData())
+            node->setRight(insert(node->getRight(), key));
+        return node;
+    }
+
+    BinaryNode* findMin(BinaryNode* node) {
+        while (node->getLeft()) node = node->getLeft();
+        return node;
+    }
+
+    BinaryNode* remove(BinaryNode* node, int key) {
+        if (!node) return nullptr;
+
+        if (key < node->getData()) {
+            node->setLeft(remove(node->getLeft(), key));
+        } else if (key > node->getData()) {
+            node->setRight(remove(node->getRight(), key));
+        } else {
+            if (!node->getLeft() && !node->getRight()) {
+                delete node;
+                return nullptr;
+            } else if (!node->getLeft()) {
+                BinaryNode* temp = node->getRight();
+                delete node;
+                return temp;
+            } else if (!node->getRight()) {
+                BinaryNode* temp = node->getLeft();
+                delete node;
+                return temp;
+            } else {
+                BinaryNode* succ = findMin(node->getRight());
+                node->setData(succ->getData());
+                node->setRight(remove(node->getRight(), succ->getData()));
+            }
+        }
+
+        return node;
+    }
+
+    bool isBalanced(BinaryNode* node, int& height) {
+        if (!node) {
+            height = -1;
+            return true;
+        }
+
+        int lh, rh;
+        bool lb = isBalanced(node->getLeft(), lh);
+        bool rb = isBalanced(node->getRight(), rh);
+
+        height = 1 + (lh > rh ? lh : rh);
+        int diff = (lh > rh ? lh - rh : rh - lh);
+
+        return lb && rb && diff <= 1;
+    }
+
+public:
+    BinarySearchTree() : root(nullptr) {}
+
+    void insert(int key) {
+        root = insert(root, key);
+    }
+
+    void remove(int key) {
+        root = remove(root, key);
+    }
+
+    bool isBalanced() {
+        int height = 0;
+        return isBalanced(root, height);
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+
+    BinarySearchTree bst;
+    for (int i = 0; i < n; ++i) {
+        string cmd;
+        int key;
+        cin >> cmd >> key;
+        if (cmd == "insert") bst.insert(key);
+        else if (cmd == "remove") bst.remove(key);
+    }
+
+    cout << (bst.isBalanced() ? "Balanced" : "Unbalanced") << endl;
+    return 0;
+}
