@@ -1,0 +1,180 @@
+#include <iostream>
+#include <queue>
+#include <string>
+
+using namespace std;
+
+class BinaryNode{
+	private:
+		int data;
+		BinaryNode* left;
+		BinaryNode* right;
+		
+	public:
+		BinaryNode(int data = 0, BinaryNode* left = nullptr, BinaryNode* right = nullptr){
+			this->data = data;
+			this->left = left;
+			this->right = right;
+		}
+		
+	int getData(){ return data;}
+	void setData(int data){ this->data = data;}
+	
+	BinaryNode* getLeft() { return left;}
+	void setLeft(BinaryNode* left) {this->left = left;}
+	
+    BinaryNode* getRight() { return right;}
+    void setRight(BinaryNode* right) { this->right = right;}
+    
+    bool isLeaf() { return left == nullptr && right == nullptr;}    
+};
+
+class BinarySearchTree {
+private:
+    BinaryNode* root;
+
+    void preorder(BinaryNode* node) {
+        if (node != nullptr) {
+            cout << node->getData() << " ";
+            preorder(node->getLeft());
+            preorder(node->getRight());
+        }
+    }
+
+    void inorder(BinaryNode* node) {
+        if (node != nullptr) {
+            inorder(node->getLeft());
+            cout << node->getData() << " ";
+            inorder(node->getRight());
+        }
+    }
+
+    void postorder(BinaryNode* node) {
+        if (node != nullptr) {
+            postorder(node->getLeft());
+            postorder(node->getRight());
+            cout << node->getData() << " ";
+        }
+    }
+
+    void removeNodes(BinaryNode* node) {
+        if (node != nullptr) {
+            removeNodes(node->getLeft());
+            removeNodes(node->getRight());
+            delete node;
+        }
+    }
+
+    BinaryNode* insert(BinaryNode* node, int key) {
+        if (node == nullptr) {
+            return new BinaryNode(key);
+        }
+        if (key < node->getData()) {
+            node->setLeft(insert(node->getLeft(), key));
+        } else if (key > node->getData()) {
+            node->setRight(insert(node->getRight(), key));
+        }
+        return node;
+    }
+
+    BinaryNode* findMin(BinaryNode* node) {
+        while (node->getLeft() != nullptr)
+            node = node->getLeft();
+        return node;
+    }
+
+    BinaryNode* remove(BinaryNode* node, int key) {
+        if (node == nullptr) return nullptr;
+
+        if (key < node->getData()) {
+            node->setLeft(remove(node->getLeft(), key));
+        } else if (key > node->getData()) {
+            node->setRight(remove(node->getRight(), key));
+        } else {
+
+            if (node->isLeaf()) {
+                delete node;
+                return nullptr;
+            } else if (node->getLeft() == nullptr || node->getRight() == nullptr) {
+                BinaryNode* child = (node->getLeft() != nullptr) ? node->getLeft() : node->getRight();
+                delete node;
+                return child;
+            } else {
+                BinaryNode* succ = findMin(node->getRight());
+                node->setData(succ->getData());
+                node->setRight(remove(node->getRight(), succ->getData()));
+            }
+        }
+        return node;
+    }
+
+public:
+    BinarySearchTree() {
+        root = nullptr;
+    }
+
+    ~BinarySearchTree() {
+        removeNodes(root);
+    }
+
+    void insert(int key) {
+        root = insert(root, key);
+    }
+
+    void remove(int key) {
+        root = remove(root, key);
+    }
+
+    void preorder() {
+        cout << "preorder: ";
+        preorder(root);
+        cout << endl;
+    }
+
+    void inorder() {
+        cout << "inorder: ";
+        inorder(root);
+        cout << endl;
+    }
+
+    void postorder() {
+        cout << "postorder: ";
+        postorder(root);
+        cout << endl;
+    }
+
+    void levelorder() {
+        cout << "levelorder: ";
+        if (root == nullptr) return;
+        queue<BinaryNode*> q;
+        q.push(root);
+        while (!q.empty()) {
+            BinaryNode* node = q.front(); q.pop();
+            cout << node->getData() << " ";
+            if (node->getLeft()) q.push(node->getLeft());
+            if (node->getRight()) q.push(node->getRight());
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+
+    BinarySearchTree bst;
+    for (int i = 0; i < n; ++i) {
+        string cmd;
+        int x;
+        cin >> cmd >> x;
+        if (cmd == "insert") bst.insert(x);
+        else if (cmd == "remove") bst.remove(x);
+    }
+
+    bst.preorder();
+    bst.inorder();
+    bst.postorder();
+    bst.levelorder();
+
+    return 0;
+}
