@@ -1,0 +1,84 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class MaxHeap {
+private:
+    static const int root_index = 1;
+    static const int HEAP_SIZE = 1001; 
+    int nodes[HEAP_SIZE];
+    int size;
+
+    int LEFT(int i) { return i * 2; }
+    int RIGHT(int i) { return i * 2 + 1; }
+    int PARENT(int i) { return i / 2; }
+
+    void up_heap(int i) {
+        while (i > root_index && nodes[i] > nodes[PARENT(i)]) {
+            swap(nodes[i], nodes[PARENT(i)]);
+            i = PARENT(i);
+        }
+    }
+
+    void down_heap(int i) {
+        while (true) {
+            int left = LEFT(i);
+            int right = RIGHT(i);
+            int largest = i;
+
+            if (left <= size && nodes[left] > nodes[largest])
+                largest = left;
+            if (right <= size && nodes[right] > nodes[largest])
+                largest = right;
+
+            if (largest != i) {
+                swap(nodes[i], nodes[largest]);
+                i = largest;
+            } else {
+                break;
+            }
+        }
+    }
+
+public:
+    MaxHeap() : size(0) { }
+
+    bool empty() { return size == 0; }
+
+    void insert(int priority) {
+        nodes[++size] = priority;
+        up_heap(size);
+    }
+
+    int remove() {
+        if (empty()) return -1; 
+        int highest = nodes[root_index];
+        nodes[root_index] = nodes[size--];
+        down_heap(root_index);
+        return highest;
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+    MaxHeap heap;
+
+    for (int i = 0; i < n; i++) {
+        string cmd;
+        cin >> cmd;
+        if (cmd == "add") {
+            int x;
+            cin >> x;
+            heap.insert(x);
+        } else if (cmd == "pop") {
+            if (heap.empty()) {
+                cout << "heap is empty" << endl;
+            } else {
+                cout << heap.remove() << endl;
+            }
+        }
+    }
+
+    return 0;
+}
