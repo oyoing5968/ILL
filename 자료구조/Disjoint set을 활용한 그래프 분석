@@ -1,0 +1,66 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+const int MAX_N = 500001;
+
+int p[MAX_N];               
+int component_size[MAX_N];  
+
+
+void make_set(int u) {
+    p[u] = u;
+    component_size[u] = 1;
+}
+
+int find_set(int u) {
+    if (p[u] != u) {
+        p[u] = find_set(p[u]);
+    }
+    return p[u];
+}
+
+bool union_set(int u, int v) {
+    int ur = find_set(u);
+    int vr = find_set(v);
+    if (ur == vr) {
+        return false;
+    }
+    p[vr] = ur;
+    component_size[ur] += component_size[vr];
+    return true;
+}
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    for (int i = 1; i <= n; i++) {
+        make_set(i);
+    }
+
+    bool has_cycle = false;
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        cin >> u >> v;
+        if (!union_set(u, v)) {
+            has_cycle = true;
+        }
+    }
+
+    int components = 0;
+    int max_component_size = 0;
+    for (int i = 1; i <= n; i++) {
+        if (p[i] == i) {
+            components++;
+            max_component_size = max(max_component_size, component_size[i]);
+        }
+    }
+
+    cout << (has_cycle ? "Found" : "Not found") << '\n';
+    cout << components << '\n';
+    cout << max_component_size << '\n';
+
+    return 0;
+}
