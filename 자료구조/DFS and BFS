@@ -1,0 +1,69 @@
+#include <iostream>
+#include <list>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+const int MAX_N = 150000;
+vector<int> Edge[MAX_N];
+bool visited_dfs[MAX_N];
+bool visited_bfs[MAX_N];
+vector<int> dfs_result;
+vector<int> bfs_result;
+
+void dfs(int u) {
+    visited_dfs[u] = true;
+    dfs_result.push_back(u);
+    for (int v : Edge[u]) {
+        if (!visited_dfs[v]) {
+            dfs(v);
+        }
+    }
+}
+
+void bfs(int s) {
+    queue<int> q;
+    visited_bfs[s] = true;
+    q.push(s);
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        bfs_result.push_back(u);
+        for (int v : Edge[u]) {
+            if (!visited_bfs[v]) {
+                visited_bfs[v] = true;
+                q.push(v);
+            }
+        }
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n, m, s, i;
+    cin >> n >> m;
+    cin >> s;
+    cin >> i;
+
+    for (int j = 0; j < m; j++) {
+        int u, v;
+        cin >> u >> v;
+        Edge[u].push_back(v);
+        Edge[v].push_back(u);
+    }
+
+    for (int j = 1; j <= n; j++) {
+        sort(Edge[j].begin(), Edge[j].end());
+    }
+
+    dfs(s);
+    bfs(s);
+
+    cout << dfs_result[i - 1] << '\n';
+    cout << bfs_result[i - 1] << '\n';
+
+    return 0;
+}
